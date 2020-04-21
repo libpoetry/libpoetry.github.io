@@ -40,44 +40,44 @@
 </head>
 
 <body>
-    <div>
-        <div class="cardBox">
-            <div class="headerBox" style="background-color: #4caf50;">
-                <p>望月</p>
-                <p>唐代：
-                    <a href="javascript:void(0)" class="label headerBox-label">李白</a>
-                </p>
-            </div>
-            <div class="bodyBox">
-                <p>床前明月光</p>
-                <p>疑似地上霜</p>
-                <p>举头望明月</p>
-                <p>低头思故乡</p>
-            </div>
-        </div>
-
-        <div class="cardBox">
-            <div class="headerBox" style="background-color: #4caf50;">
-                <p>春望</p>
-                <p>唐代：
-                    <a href="javascript:void(0)" class="label headerBox-label">李白</a>
-                </p>
-            </div>
-            <div class="bodyBox">
-                <p>国破山河在</p><p>城春草木深</p>
-                <p>
-                    感时花溅泪</p><p>恨别鸟惊心</p>
-                <p>
-                    烽火连三月</p><p>家书抵万金</p>
-                <p>
-                    白头搔更短</p><p>浑欲不胜簪</p>
-            </div>
-        </div>
-
-
+    <div id="gs-view">
 
     </div>
-
+    <script>
+        function sleep(ms) {
+            return new Promise((resolve) => setTimeout(resolve, ms));
+        }
+        function loadPoetry(gsid, gstitle, gsdynasty, gsauthor, gstext) {
+            var poetryStr = '<div class="cardBox">' +
+                '<div class="headerBox" style="background-color: #4caf50;">' +
+                '<p name="gs-id" style="display: none;">' + gsid + '</p>' +
+                '<p name="gs-title">' + gstitle + '</p>' +
+                '<p><span name="gs-dynasty">' + gsdynasty + '</span>：' +
+                '<a name="gs-author" href="" class="label headerBox-label">' + gsauthor + '</a></p>' +
+                '</div><div class="bodyBox" name="gs-text">' + gstext + '</div></div>';
+            document.getElementById("gs-view").innerHTML += poetryStr;
+        }
+        async function getPoetry() {
+            for (var i = 1; i < 400000; i++) {
+                var url = "https://libpoetry.github.io/data/by-id/"+i.toString()+".json";
+                fetch(url)
+                    .then(function (resp) { return jtext = resp.json(); })
+                    .then(function (poetryObj) {
+                        console.log(poetryObj);
+                        console.log(poetryObj.dynasty);
+                        loadPoetry(poetryObj.id, poetryObj.title, poetryObj.dynasty, poetryObj.author, poetryObj.text)
+                    })
+                    .catch(function(e){console.log(e)});
+                if(i>1000)var temple = await sleep(100);
+            }
+        }
+        async function test() {
+            var temple = await sleep(1000);
+            console.log(1111);
+            return temple;
+        }
+        getPoetry();
+    </script>
 </body>
 
 </html>
