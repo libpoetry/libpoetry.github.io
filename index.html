@@ -47,7 +47,7 @@
         function sleep(ms) {
             return new Promise((resolve) => setTimeout(resolve, ms));
         }
-        function loadPoetry(gsid, gstitle, gsdynasty, gsauthor, gstext) {
+        async function loadPoetry(gsid, gstitle, gsdynasty, gsauthor, gstext) {
             var poetryStr = '<div class="cardBox">' +
                 '<div class="headerBox" style="background-color: #4caf50;">' +
                 '<p name="gs-id" style="display: none;">' + gsid + '</p>' +
@@ -63,18 +63,11 @@
                 fetch(url)
                     .then(function (resp) { return jtext = resp.json(); })
                     .then(function (poetryObj) {
-                        console.log(poetryObj);
-                        console.log(poetryObj.dynasty);
                         loadPoetry(poetryObj.id, poetryObj.title, poetryObj.dynasty, poetryObj.author, poetryObj.text)
                     })
                     .catch(function(e){console.log(e)});
-                if(i>1000)var temple = await sleep(100);
+                var temple = await sleep(80);
             }
-        }
-        async function test() {
-            var temple = await sleep(1000);
-            console.log(1111);
-            return temple;
         }
         getPoetry();
     </script>
