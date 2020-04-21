@@ -15,62 +15,61 @@
             padding: 5px;
             padding-top: 15px;
         }
-
         .headerBox {
             color: #fff;
             padding: 10px;
             font-size: 15px;
             height: 70px;
         }
-
         .headerBox-label {
             border-radius: .25em;
             background-color: rgb(51, 106, 209);
             color: #fff;
         }
-
         .bodyBox {
             padding: 10px;
         }
-
         .bodyBox p {
             margin-left: 5px;
         }
     </style>
-</head>
-
-<body>
-    <div id="gs-view">
-
-    </div>
     <script>
         function sleep(ms) {
             return new Promise((resolve) => setTimeout(resolve, ms));
         }
         function loadPoetry(gsid, gstitle, gsdynasty, gsauthor, gstext) {
-            var poetryStr = '<div class="cardBox"><div class="headerBox" style="background-color: #4caf50;"><p name="gs-id" style="display: none;">' + 
-                gsid + '</p><p name="gs-title">' + 
-                gstitle + '</p><p><span name="gs-dynasty">' + 
-                gsdynasty + '</span>：<a name="gs-author" href="" class="label headerBox-label">' + 
-                gsauthor + '</a></p></div><div class="bodyBox" name="gs-text">' + 
+            var poetryStr = '<div class="cardBox"><div class="headerBox" style="background-color: #4caf50;"><p name="gs-id" style="display: none;">' +
+                gsid + '</p><p name="gs-title">' +
+                gstitle + '</p><p><span name="gs-dynasty">' +
+                gsdynasty + '</span>：<a name="gs-author" href="" class="label headerBox-label">' +
+                gsauthor + '</a></p></div><div class="bodyBox" name="gs-text">' +
                 gstext + '</div></div>';
-            document.getElementById("gs-view").innerHTML += poetryStr;
+            return poetryStr;
         }
         async function getPoetry() {
             for (var i = 1; i < 400000; i++) {
-                var url = "https://poetry-"+(i%5).toString()+".cdn.iisjy.cn/by-id/"+i.toString()+".json";
-                var poeStr = "";
-                fetch(url)
+                fetch("https://poetry-" + (i % 5).toString() + ".cdn.iisjy.cn/by-id/" + i.toString() + ".json")
                     .then(function (resp) { return jtext = resp.json(); })
                     .then(function (poetryObj) {
-                        loadPoetry(poetryObj.id, poetryObj.title, poetryObj.dynasty, poetryObj.author, poetryObj.text);
+                        return loadPoetry(poetryObj.id, poetryObj.title, poetryObj.dynasty, poetryObj.author, poetryObj.text);
                     })
-                    .catch(function(e){console.log(e)});
-                var temple = await sleep(5);
+                    .then(function(htext){
+                        var objE = document.createElement("div");
+                        objE.innerHTML = htext;
+                        return objE.childNodes;
+                    }).then(function(hobj){
+                        document.getElementById("gs-view").appendChild(hobj[0]);
+                    })
+                    .catch(function (e) { console.log(e) });
+                var temple = await sleep(2);
             }
         }
-        getPoetry();
     </script>
+</head>
+
+<body>
+    <div id="gs-view"></div>
+    <script>getPoetry();</script>
 </body>
 
 </html>
