@@ -33,43 +33,20 @@
             margin-left: 5px;
         }
     </style>
-    <script>
-        function sleep(ms) {
-            return new Promise((resolve) => setTimeout(resolve, ms));
-        }
-        function loadPoetry(gsid, gstitle, gsdynasty, gsauthor, gstext) {
-            var poetryStr = '<div class="cardBox"><div class="headerBox" style="background-color: #4caf50;"><p name="gs-id" style="display: none;">' +
-                gsid + '</p><p name="gs-title">' +
-                gstitle + '</p><p><span name="gs-dynasty">' +
-                gsdynasty + '</span>：<a name="gs-author" href="" class="label headerBox-label">' +
-                gsauthor + '</a></p></div><div class="bodyBox" name="gs-text">' +
-                gstext + '</div></div>';
-            return poetryStr;
-        }
-        async function getPoetry() {
-            for (var i = 1; i < 400000; i++) {
-                fetch("https://poetry-" + (i % 5).toString() + ".cdn.iisjy.cn/by-id/" + i.toString() + ".json")
-                    .then(function (resp) { return jtext = resp.json(); })
-                    .then(function (poetryObj) {
-                        return loadPoetry(poetryObj.id, poetryObj.title, poetryObj.dynasty, poetryObj.author, poetryObj.text);
-                    })
-                    .then(function(htext){
-                        var objE = document.createElement("div");
-                        objE.innerHTML = htext;
-                        return objE.childNodes;
-                    }).then(function(hobj){
-                        document.getElementById("gs-view").appendChild(hobj[0]);
-                    })
-                    .catch(function (e) { console.log(e) });
-                var temple = await sleep(2);
-            }
-        }
-    </script>
 </head>
 
 <body>
     <div id="gs-view"></div>
-    <script>getPoetry();</script>
+    <script>
+        var addNode = evnt =>{
+            var objE = document.createElement("div");
+            objE.innerHTML = evnt.data;
+            document.getElementById("gs-view").appendChild(objE.childNodes[0]);
+        }
+        var w1 = new Worker('./getpoetry.js');
+        w1.onmessage = addNode;
+        w1.postMessage(1);
+    </script>
 </body>
 
 </html>
