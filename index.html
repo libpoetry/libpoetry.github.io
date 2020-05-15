@@ -10,8 +10,14 @@
             objE.innerHTML = evnt.data;
             document.getElementById("gs-view").appendChild(objE.childNodes[0]);
         }
+        var w0 = new Worker('./getpoetry.js');
+        w0.onmessage = addNode;
         var w1 = new Worker('./getpoetry.js');
         w1.onmessage = addNode;
+        var w2 = new Worker('./getpoetry.js');
+        w2.onmessage = addNode;
+        var w3 = new Worker('./getpoetry.js');
+        w3.onmessage = addNode;
     </script>
     <link href="https://cdn.staticfile.org/twitter-bootstrap/3.4.1/css/bootstrap.min.css" rel="stylesheet">
     <style type="text/css">
@@ -47,7 +53,10 @@
 <body>
     <div id="gs-view"></div>
     <script>
+        w0.postMessage(0);
         w1.postMessage(1);
+        w2.postMessage(2);
+        w3.postMessage(3);
     </script>
 </body>
 
