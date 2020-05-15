@@ -5,10 +5,13 @@
     <meta charset="UTF-8">
     <title>古诗词</title>
     <script>
+        var now_index =0;
         var addNode = evnt =>{
         var objE = document.createElement("div");
             objE.innerHTML = evnt.data;
             document.getElementById("gs-view").appendChild(objE.childNodes[0]);
+            now_index+=1;
+            document.title=`古诗词(已加载${now_index.toString()})`;
         }
         var w0 = new Worker('./getpoetry.js');
         w0.onmessage = addNode;
