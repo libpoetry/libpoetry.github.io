@@ -5,61 +5,33 @@
     <meta charset="UTF-8">
     <title>古诗词</title>
     <script>
-        var now_index =0;
-        var addNode = evnt =>{
-        var objE = document.createElement("div");
+        var now_index = 0;
+        const addNode = evnt => {
+            const objE = document.createElement("div");
             objE.innerHTML = evnt.data;
             document.getElementById("gs-view").appendChild(objE.childNodes[0]);
-            now_index+=1;
-            document.title=`古诗词(已加载${now_index.toString()})`;
+            document.title = `古诗词(已加载${now_index.toString()})`;
+            document.getElementById("prog").value = now_index / 3900;
+            now_index++;
         }
-        var w0 = new Worker('./getpoetry.js');
-        w0.onmessage = addNode;
-        var w1 = new Worker('./getpoetry.js');
-        w1.onmessage = addNode;
-        var w2 = new Worker('./getpoetry.js');
-        w2.onmessage = addNode;
-        var w3 = new Worker('./getpoetry.js');
-        w3.onmessage = addNode;
+        const wks = Array(8);
+        for (let i = 0; i < 8; i++) {
+            wks[i] = new Worker('./getpoetry.js');
+            wks[i].onmessage = addNode;
+        }
+        const stop = () => wks.forEach(elem => elem.terminate())
     </script>
     <link href="https://cdn.staticfile.org/twitter-bootstrap/3.4.1/css/bootstrap.min.css" rel="stylesheet">
-    <style type="text/css">
-        .cardBox {
-            width: 200px;
-            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-            text-align: center;
-            float: left;
-            margin-right: 10px;
-            padding: 5px;
-            padding-top: 15px;
-        }
-        .headerBox {
-            color: #fff;
-            padding: 10px;
-            font-size: 15px;
-            height: 70px;
-        }
-        .headerBox-label {
-            border-radius: .25em;
-            background-color: rgb(51, 106, 209);
-            color: #fff;
-        }
-        .bodyBox {
-            padding: 10px;
-        }
-        .bodyBox p {
-            margin-left: 5px;
-        }
-    </style>
+    <link href="./main.css" rel="stylesheet">
 </head>
 
 <body>
+    <progress id="prog" value="0" max="100" class="progTab"></progress>
     <div id="gs-view"></div>
     <script>
-        w0.postMessage(0);
-        w1.postMessage(1);
-        w2.postMessage(2);
-        w3.postMessage(3);
+        for (let i = 0; i < 8; i++) {
+            wks[i].postMessage(i);
+        }
     </script>
 </body>
 
