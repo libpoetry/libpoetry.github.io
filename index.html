@@ -4,34 +4,74 @@
 <head>
     <meta charset="UTF-8">
     <title>古诗词</title>
+
     <script>
-        var now_index = 0;
+        // 判断设备类型，加载不同的 css 文件。
+        const is_mobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        const cssLink = document.createElement("link");  
+        cssLink.rel = "stylesheet";
+        cssLink.type="text/css";
+        cssLink.href=(is_mobile)?"css/mobi.css":"css/main.css";
+        document.head.appendChild(cssLink)
+        const empty = obj => (obj==null || obj == "");
+
+        // 从 URL 中读取查询字符串
+        const wdStr = new URL(window.location.href).searchParams.get('wd');
+        const sType = new URL(window.location.href).searchParams.get('type');
+        var now_index =0;
+        // 加载 worker 文件
+        const WKloadJson = new Worker('/worker/getPoe1kJson.js');
+        const WKgetPoe1kHtml = new Worker('/worker/getPoe1kML.js')
         const addNode = evnt => {
             const objE = document.createElement("div");
             objE.innerHTML = evnt.data;
-            document.getElementById("gs-view").appendChild(objE.childNodes[0]);
+            objE.childNodes.forEach(ee => document.getElementById("gs-view").appendChild(ee));
+            
             document.title = `古诗词(已加载${now_index.toString()})`;
-            document.getElementById("prog").value = now_index / 3900;
+            // document.getElementById("prog").value = now_index / 3900;
             now_index++;
         }
-        const wks = Array(8);
-        for (let i = 0; i < 8; i++) {
-            wks[i] = new Worker('./getpoetry.js');
-            wks[i].onmessage = addNode;
+        const reciveJson = evnt => WKgetPoe1kHtml.postMessage(evnt.data);
+        WKloadJson.onmessage=reciveJson;
+        WKgetPoe1kHtml.onmessage=addNode;
+        // if (empty(wdStr)) {
+        //     loadAllPoe()
+        // }else{
+        //     doSearch(wdStr)
+        // }
+        // const loadAllPoe = () =>{
+            
+        // }
+        const doSearch = () => {const wd = document.getElementById('SearchBox').value}; 
+        var searchType = 1;
+        const setType = () => {
+            searchType = 0;
+            document.getElementsByName("searchType").forEach(element => !element.checked || (searchType += parseInt(element.value)));
         }
-        const stop = () => wks.forEach(elem => elem.terminate())
+        const dispType = (num) => {
+            document.getElementsByName("searchType")[0].checked = (num & 1) === 1;
+            document.getElementsByName("searchType")[1].checked = (num & 2) === 2;
+            document.getElementsByName("searchType")[2].checked = (num & 4) === 4;
+        }
+
     </script>
-    <link href="https://cdn.staticfile.org/twitter-bootstrap/3.4.1/css/bootstrap.min.css" rel="stylesheet">
-    <link href="./main.css" rel="stylesheet">
 </head>
 
 <body>
-    <progress id="prog" value="0" max="100" class="progTab"></progress>
+    <div style="display: flex;width: 100%;">
+        <input type="text" id="SearchBox" placeholder="请输入关键字：" oninput="doSearch()" style="width: fit-content" />
+        <button onclick="doSearch()">搜索</button>
+        <input oninput="setType()" name="searchType" type="checkbox" value="1" checked />标题
+        <input oninput="setType()" name="searchType" type="checkbox" value="2" />正文
+        <input oninput="setType()" name="searchType" type="checkbox" value="4" />作者
+    </div>
+
+    <!-- <progress id="prog" value="0" max="100" class="progTab"></progress> -->
     <div id="gs-view"></div>
+    <!-- <script>for (let i = 0; i < 8; i++) wks[i].postMessage(i);</script> -->
     <script>
-        for (let i = 0; i < 8; i++) {
-            wks[i].postMessage(i);
-        }
+        dispType(empty(sType)?1:parseInt(sType));
+        WKloadJson.postMessage({"status":"begin"})
     </script>
 </body>
 

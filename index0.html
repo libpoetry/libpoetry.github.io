@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <title>古诗词</title>
+    <script>
+        const is_mobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        var now_index = 0;
+        const addNode = evnt => {
+            const objE = document.createElement("div");
+            objE.innerHTML = evnt.data;
+            document.getElementById("gs-view").appendChild(objE.childNodes[0]);
+            document.title = `古诗词(已加载${now_index.toString()})`;
+            document.getElementById("prog").value = now_index / 3900;
+            now_index++;
+        }
+        const wks = Array(8);
+        for (let i = 0; i < 8; i++) {
+            wks[i] = new Worker('worker/getpoetry.js');
+            wks[i].onmessage = addNode;
+        }
+
+        const stop = () => wks.forEach(elem => elem.terminate())
+
+        const cssLink = document.createElement("link");  
+        cssLink.rel = "stylesheet";
+        cssLink.type="text/css";
+        cssLink.href=(is_mobile)?"css/mobi.css":"css/main.css";
+        document.head.appendChild(cssLink)
+        const doSearch = ()=>{
+            const wd = document.getElementById('SearchBox').value;
+            if(wd == null || wd =="") alert("请输入字符串！")
+            else{
+                stop();
+                window.location.href=`search.html?wd=${wd}`;
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <div style="display: flex;width: 100%;">
+        <input type="text" id="SearchBox" placeholder="请输入关键字：" style="width: fit-content"/>
+        <button onclick="doSearch()">搜索</button>
+    </div>
+
+    <progress id="prog" value="0" max="100" class="progTab"></progress>
+    <div id="gs-view"></div>
+    <script>for (let i = 0; i < 8; i++) wks[i].postMessage(i);</script>
+</body>
+
+</html>
