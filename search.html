@@ -35,7 +35,8 @@
         const WKloadJson = Array(8);
         for (let i = 0; i < 8; i++) {
             WKloadJson[i] = new Worker('/worker/getPoe1kJson.js');
-            WKloadJson[i].onmessage = reciveJson;
+            // WKloadJson[i].onmessage = reciveJson;
+            WKloadJson[i].onmessage = addNode;
         }
         const WKgetPoe1kHtml = new Worker('/worker/getPoe1kML.js')
 
