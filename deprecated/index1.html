@@ -31,7 +31,10 @@
             document.getElementById("prog").value = now_index;
             now_index++;
         }
-        const reciveJson = evnt => WKgetPoe1kHtml.postMessage(evnt.data);
+        const reciveJson = evnt => WKgetPoe1kHtml.postMessage({
+            i:'add',
+            p:evnt.data
+        });
 
         // 加载 worker 文件
         const WKloadJson = Array(WKA_NUM);
@@ -39,7 +42,7 @@
             WKloadJson[i] = new Worker('/worker/getPoe1kJson.js');
             WKloadJson[i].onmessage = addNode;
         }
-        const WKgetPoe1kHtml = new Worker('/worker/getPoe1kML.js')
+        const WKgetPoe1kHtml = new Worker('/worker/poetry.js')
 
 
         // WKloadJson.onmessage=reciveJson;

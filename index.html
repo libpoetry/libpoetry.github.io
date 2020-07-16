@@ -19,30 +19,32 @@
         const wdStr = new URL(window.location.href).searchParams.get('wd');
         const sType = new URL(window.location.href).searchParams.get('type');
         var now_index =0;
-        var pool = "";
         const addNode = evnt => {
             // const objE = document.createElement("div");
             // objE.innerHTML = evnt.data;
-            pool+=evnt.data;
             // objE.childNodes.forEach(ee => document.getElementById("gs-view").appendChild(ee));
             document.title = `古诗词(已加载${now_index.toString()})`;
             document.getElementById("prog").value = now_index;
             now_index++;
         }
-        const reciveJson = evnt => WKgetPoe1kHtml.postMessage(evnt.data);
+        const reciveJson = evnt =>{
+            WKpoetry.postMessage(evnt.data);
+            document.title = `古诗词(已加载${now_index.toString()})`;
+            document.getElementById("prog").value = now_index;
+            now_index++;
+        } 
 
         // 加载 worker 文件
         const WKloadJson = Array(8);
         for (let i = 0; i < 8; i++) {
             WKloadJson[i] = new Worker('/worker/getPoe1kJson.js');
-            // WKloadJson[i].onmessage = reciveJson;
-            WKloadJson[i].onmessage = addNode;
+            WKloadJson[i].onmessage = reciveJson;
+            // WKloadJson[i].onmessage = addNode;
         }
-        const WKgetPoe1kHtml = new Worker('/worker/getPoe1kML.js')
+        const WKpoetry = new Worker('/worker/getPoe1kML.js')
 
 
-        // WKloadJson.onmessage=reciveJson;
-        WKgetPoe1kHtml.onmessage=addNode;
+        // WKpoetry.onmessage=addNode;
         // if (empty(wdStr)) {
         //     loadAllPoe()
         // }else{
